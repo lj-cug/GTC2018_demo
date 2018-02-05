@@ -186,6 +186,47 @@ export ESMFMKFILE=$ESMF_INSTALL_PREFIX/lib/libO/Linux.intel.64.intelmpi.default/
 
 Note that the **Linux.intel.64.intelmpi.default** directory could change based on the used architecture, compiler and MPI implementation.
 
+### 1.5. ParaView
+
+In case of using NVIDIA GPUs for the rendering, ParaView can be installed with the support of [EGL](https://www.khronos.org/egl) to process and render data without X window (just write png files to disk). In this case, user requires following components:
+
+* A graphics card driver that supports OpenGL rendering through EGL. 
+* EGL headers (does not come with the Nvidia driver) - download from [here](https://www.khronos.org/registry/EGL/)
+* Set of definitions in the advance configuration section of ParaView
+
+For configuration of ParaView, **EGL\_INCLUDE\_DIR**, **EGL\_LIBRARY**, **EGL\_gldispatch\_LIBRARY** and **EGL\_opengl\_LIBRARY** must point correct files and folders. More information about the ParaView EGL support and its configuration can be found [here](https://blog.kitware.com/off-screen-rendering-through-the-native-platform-interface-egl/). There is also Nvidia blog entry in [here](https://devblogs.nvidia.com/parallelforall/egl-eye-opengl-visualization-without-x-server/) for more information.
+
+```
+cd $PROGS
+wget -O ParaView-v5.4.1.tar.gz "https://www.paraview.org/paraview-downloads/download.php?submit=Download&version=v5.4&type=binary&os=Sources&downloadFile=ParaView-v5.4.1.tar.gz"
+tar -zxvf ParaView-v5.4.1.tar.gz
+mv ParaView-v5.4.1 paraview-5.4.1
+cd paraview-5.4.1
+mkdir src
+mv * src/.
+mkdir build
+cd build
+cmake \
+  -DCMAKE_BUILD_TYPE=Release                                   \
+  -DPARAVIEW_ENABLE_PYTHON=ON                                  \
+  -DPARAVIEW_USE_MPI=ON                                        \
+  -DPARAVIEW_BUILD_QT_GUI=OFF                                  \
+  -DVTK_USE_X=OFF                                              \
+  -DOPENGL_INCLUDE_DIR=IGNORE                                  \
+  -DOPENGL_xmesa_INCLUDE_DIR=IGNORE                            \
+  -DOPENGL_gl_LIBRARY=IGNORE                                   \
+  -DOSMESA_INCLUDE_DIR=${MESA_INSTALL_PREFIX}/include          \
+  -DOSMESA_LIBRARY=${MESA_INSTALL_PREFIX}/lib/libOSMesa.so     \
+  -DVTK_OPENGL_HAS_OSMESA=ON                                   \
+  -DVTK_USE_OFFSCREEN=OFF ../src
+make
+```
+Option **-DOSMESA\_LIBRARY** can be also set as **\${MESA\_INSTALL\_PREFIX}/lib/libOSMesa.a** to use static library rather than dynamic one.
+
+**Note:** The performance of COP component can be affected in case of using software emulation for rendering. The initial tests show that the OSMesa installation is 10x slower than EGL configuration. 
+
+**Note:** If there is a possibility to have access to X window to use Catalyst Live feature, then there is no need to install ParaView with EGL libraries.
+
 ## 2 Installation of Model Components
 
 After installing the required libraries, the next step is installing individual model components with coupling support. In this case, user might install model components to any desired location (or directory) in the file system and point out the installation directories in the configuration phase of the coupled model (driver). 
@@ -213,32 +254,50 @@ The RegCM is used as atmospheric model component and it requires netCDF library 
 
 ```
 cd $SCRATCH/COP_LR/src/atm
-wget -c 
+wget https://github.com/uturuncoglu/GTC2018_demo/raw/master/src/r6146.tar.gz
 tar -zxvf r6146.tar.gz
 cd r6146
 ./bootstrap.sh
 ./configure --prefix=`pwd` --enable-cpl CC=icc FC=ifort MPIFC=mpiifort
-make
-make install
+make clean install
 ```
 
 **To install ocean model:**
 
 ```
 cd $SCRATCH/COP_LR/src/ocn
-wget 
+wget https://github.com/uturuncoglu/GTC2018_demo/raw/master/src/roms-r809.tar.gz
 tar -zxvf roms-r809.tar.gz
 ```
 
-To install ocean model component, user need to edit two files: **1)** build.sh and **2)** roms-r809/Compilers/Linux-ifort.mk (this file is architecture specific - Linux and Intel Compiler - and might change based on used computing architecture)
+To install ocean model, user need to edit two files: **1)** build.sh and **2)** roms-r809/Compilers/Linux-ifort.mk (this file is architecture specific and might change based on used computing architecture, Linux and Intel Compiler).
 
+* **build.sh**: Edit **MY\_ROOT\_DIR** to point ocean model source directory (in this case, it is $SCRATCH/COP\_LR/src/ocn). Edit **which\_MPI** variable to define MPI implementation. Edit **FORT** variable to configure Fortran compiler.
 
+* **roms-r809/Compilers/Linux-ifort.mk**: This file could change based on used OS and Fortran Compiler. For example, Linux-pgi.mk file must be edited for Linux and PGI compiler. The file is used to specify compiler specific flags (can be used to optimize the model) and netCDF library (edit NETCDF\_INCDIR and NETCDF\_LIBDIR).
 
-
-
-As it can be seen from the figure, each model components (including "driver" itself, which is called as "drv" in the figure) use its own directory for the source files, input and output. In addition to the directory structure, the configuration files, run script (OpenPBS, LSF etc.), input and output files can be placed in the main working directory (**BASE_DIR**). RegESM executable (**DRV_SRC**) placed in the working directory is the soft link and can be created with following commands, 
+Then, issue following command to install model,
 
 ```
-cd $BASE_DIR
-ln -s $DRV_SRC/regesm.x
+./build.sh
 ```
+
+## 3 Installation of Driver
+
+The RegESM modeling system can be installed with COP support using following command,
+
+```
+cd $SCRATCH/COP_LR/src/drv
+wget https://github.com/uturuncoglu/GTC2018_demo/raw/master/src/RegESM.tar.gz
+tar -zxvf RegESM.tar.gz
+cd RegESM
+./bootstrap.sh
+./configure --prefix=`pwd` --with-atm=../../atm/r6146 --with-ocn=../../ocn/Build --with-paraview=/okyanus/users/uturuncoglu/progs/paraview-5.4.1/intel_osmesa CC=icc FC=ifort MPIFC=mpiifort CXX=icpc
+make clean install
+```
+
+**Note:** The path for ParaView installation might change. Please specify directory for your installation.
+
+## 4 Running Modeling System
+
+To run the co-processing enable coupled model
