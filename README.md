@@ -414,15 +414,10 @@ To run the model, user need to edit following configuration files,
 | 10 | 532         | 19     | 28     |
 | 11 | 588         | 12     | 49     |
 
-* **namelist.rc:** The **PETs** parameter needs to be changed and must be consistent with the job submission script and the configuration file of the ocean model (**NtileI** and **NtileJ** tiling parameters).
+* **namelist.rc:** The **PETs** parameter needs to be changed and must be consistent with the job submission script and the configuration file of the ocean model (**NtileI** and **NtileJ** tiling parameters). Note that ATM-COP and ATM-OCN-COP cases uses different **namelist.rc** and **exfield.tbl** (see previous section).
 
+**Note:** More information about the configuration file/s can be found in [here](https://github.com/uturuncoglu/RegESM/blob/master/docs/04_Usage.md)).
 
-The COP component also able to process data flowing from multiple model component (both ATM and OCN) and this is achieved by adding new fields and section to **exfield.tbl** configuration file (more information about the configuration file/s can be found in [here](https://github.com/uturuncoglu/RegESM/blob/master/docs/04_Usage.md)).
+## 4.5 Running Model
 
-
-#TODO
-* Add time anotation to visualization pieline?
-* Create also pipeline without coastline?
-
-
-**Note:** An example job submission script (run.job, SLURM) can be also found in $SCRATCH/COP_LR directory. You might need to edit script based on installation of third-party libraries and environment that will be used to run the job.
+An example job submission script (run.job, SLURM) can be also found in $SCRATCH/COP_LR directory. You might need to edit script based on installation of third-party libraries and environment that will be used to run the job.
