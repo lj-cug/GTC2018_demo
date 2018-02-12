@@ -366,7 +366,7 @@ This will create a folder named **scripts/**. Also note that the visualization p
 
 **Note:** User needs to modify the paths of static files (for topography and coastline) in the co-processing plugin generated Python scripts (*.py files under scripts/ directory). So, search **coastlinevtk** and **topovtk** variables in the Python scripts and replace the paths with appropriate ones for your system.
 
-**Note:** States and datasets (only one time step) that are used to create visualization pipelines can be retrieved from [here](wget https://github.com/uturuncoglu/GTC2018_demo/raw/master/coproc/states.tar.gz). Also note that states are created using ParaView 5.4.1 under Linux OS.
+**Note:** States and datasets (only one time step) that are used to create visualization pipelines can be retrieved from [here](https://github.com/uturuncoglu/GTC2018_demo/raw/master/coproc/states.tar.gz). Also note that states are created using ParaView 5.4.1 under Linux OS.
 
 ### 4.3.1 ATM-COP
 
