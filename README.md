@@ -61,7 +61,7 @@ cd netcdf-4.3.0
 mkdir src
 mv * src/.
 cd src
-./configure --prefix=$PROGS/netcdf-4.3.0 CC=icc FC=ifort LDFLAGS="-L$PROGS/zlib-1.2.8/lib - L$PROGS/hdf5-1.8.11/lib" CPPFLAGS="-I$PROGS/zlib-1.2.8/include -I/$PROGS/hdf5- 1.8.11/include"
+./configure --prefix=$PROGS/netcdf-4.3.0 CC=icc FC=ifort LDFLAGS="-L$PROGS/zlib-1.2.8/lib -L$PROGS/hdf5-1.8.11/lib" CPPFLAGS="-I$PROGS/zlib-1.2.8/include -I/$PROGS/hdf5- 1.8.11/include"
 make
 make install
 export LD_LIBRARY_PATH=$PROGS/netcdf-4.3.0/lib:$LD_LIBRARY_PATH
@@ -72,11 +72,12 @@ export LD_LIBRARY_PATH=$PROGS/netcdf-4.3.0/lib:$LD_LIBRARY_PATH
 ```
 cd $PROGS
 wget ftp://ftp.unidata.ucar.edu/pub/netcdf/netcdf-cxx-4.2.tar.gz
+tar -zxvf netcdf-cxx-4.2.tar.gz
 cd netcdf-cxx-4.2
 mkdir src
 mv * src/.
 cd src
-./configure --prefix=$PROGS/netcdf-cxx-4.2 CC=icc CXX=icpc LDFLAGS="-L$PROGS/zlib-1.2.8/lib - L$PROGS/hdf5-1.8.11/lib -L$PROGS/netcdf-4.3.0/lib" CPPFLAGS="-I$PROGS/zlib-1.2.8/include - I/$PROGS/hdf5-1.8.11/include -I$PROGS/netcdf-4.3.0/include"
+./configure --prefix=$PROGS/netcdf-cxx-4.2 CC=icc CXX=icpc LDFLAGS="-L$PROGS/zlib-1.2.8/lib -L$PROGS/hdf5-1.8.11/lib -L$PROGS/netcdf-4.3.0/lib" CPPFLAGS="-I$PROGS/zlib-1.2.8/include -I/$PROGS/hdf5-1.8.11/include -I$PROGS/netcdf-4.3.0/include"
 make
 make install
 ```
@@ -86,11 +87,12 @@ make install
 ```
 cd $PROGS
 wget ftp://ftp.unidata.ucar.edu/pub/netcdf/netcdf-fortran-4.2.tar.gz
+tar -zxvf netcdf-fortran-4.2.tar.gz
 cd netcdf-fortran-4.2
 mkdir src
 mv * src/.
 cd src
-./configure --prefix=$PROGS/netcdf-fortran-4.2 CC=icc FC=ifort LDFLAGS="-L$PROGS/zlib-1.2.8/lib - L$PROGS/hdf5-1.8.11/lib -L$PROGS/netcdf-4.3.0/lib" CPPFLAGS="-I$PROGS/zlib-1.2.8/include - I/$PROGS/hdf5-1.8.11/include -I$PROGS/netcdf-4.3.0/include"
+./configure --prefix=$PROGS/netcdf-fortran-4.2 CC=icc FC=ifort LDFLAGS="-L$PROGS/zlib-1.2.8/lib -L$PROGS/hdf5-1.8.11/lib -L$PROGS/netcdf-4.3.0/lib" CPPFLAGS="-I$PROGS/zlib-1.2.8/include -I/$PROGS/hdf5-1.8.11/include -I$PROGS/netcdf-4.3.0/include"
 make
 make install
 ```
@@ -101,6 +103,7 @@ Then, link content of include and library folders of C++ and Fortran under C int
 cd $PROGS/netcdf-4.3.0/lib
 ln -s ../../netcdf-cxx-4.2/lib/* .
 ln -s ../../netcdf-fortran-4.2/lib/* .
+cd $PROGS/netcdf-4.3.0/include
 ln -s ../../netcdf-cxx-4.2/include/* .
 ln -s ../../netcdf-fortran-4.2/include/* . 
 export NETCDF=$PROGS/netcdf-4.3.0
